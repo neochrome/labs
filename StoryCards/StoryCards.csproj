@@ -71,6 +71,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="content\images\bug.png" />
+    <Content Include="content\images\chore.png" />
+    <Content Include="content\images\feature.png" />
     <Content Include="content\print.css" />
     <Content Include="Global.asax" />
     <Content Include="content\styles.css" />
