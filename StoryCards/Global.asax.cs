@@ -10,7 +10,8 @@ namespace StoryCards
 			routes.RouteExistingFiles = true;
 			routes.IgnoreRoute("content/{*all}");
 
-			routes.MapRoute("Default", "{controller}/{action}/{id}", new { controller = "home", action = "index", id = UrlParameter.Optional });
+			routes.MapRoute("Cards", "cards/{apiToken}/{projectId}/{iteration}", new { controller = "cards", action = "index" });
+			routes.MapRoute("Home", "", new { controller = "cards", action = "home", id = UrlParameter.Optional });
 		}
 
 		protected void Application_Start()
