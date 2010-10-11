@@ -1,0 +1,14 @@
+﻿<%@ Master Language="C#" Inherits="System.Web.Mvc.ViewMasterPage" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head runat="server">
+  <asp:ContentPlaceHolder ID="PageInit" runat="server"/>
+  <title><asp:ContentPlaceHolder ID="TitleContent" runat="server" /></title>
+  <link rel="stylesheet" type="text/css" href="<%=Url.Content("~/content/styles.css")%>" />
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+  <asp:ContentPlaceHolder ID="HeadContent" runat="server"/>
+</head>
+<body>
+  <asp:ContentPlaceHolder ID="MainContent" runat="server"/>
+</body>
+</html>

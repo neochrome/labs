@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<weblink xmlns="http://www.garmin.com/xmlschemas/WebLinkExtensions/v1">
+  <displayName>
+    <token xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="Literal_t" content="Find nearest (10km) caches info on geocaching.com"/>
+  </displayName>
+  <wlxNamespace></wlxNamespace>
+  <version>1</version>
+  <creationDate>2008-09-28</creationDate>
+  <supportedLanguages>
+    <supportedLanguage>ENU</supportedLanguage>
+  </supportedLanguages>
+  <url>
+    <token xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="Literal_t" content="http://www.geocaching.com/seek/nearest.aspx?lat="/>
+    <token xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="Value_t" format="LAT_DEGREES"/>
+    <token xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="Literal_t" content="&amp;lng="/>
+    <token xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="Value_t" format="LON_DEGREES"/>
+    <token xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="Literal_t" content="&amp;f=1&amp;dist=5"/>
+  </url>
+</weblink>

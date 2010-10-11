@@ -1,0 +1,16 @@
+* { font-family: Verdana }
+body { background-color: white }
+h1 { font-size: 8mm; background-color: rgba(255,255,255,0.8); text-align: center; }
+.break { clear: both; }
+.page { page-break-after: always; }
+.ftlt { float: left; }
+.card { 
+    background-repeat: no-repeat; background-position: center;
+    padding: 5mm; width:16cm; min-height: 10cm; border: 2mm solid black;
+    position: relative; margin: 3mm;
+}
+.id { color: silver; position: absolute; bottom: 5mm; right: 5mm; font-size: 5mm; }
+.estimate { color: silver; position: absolute; bottom: 5mm; left: 5mm; font-size: 1cm; }
+.bug { background-image: url('images/bug.png'); }
+.chore { background-image: url('images/chore.png'); }
+.feature { background-image: url('images/feature.png'); }

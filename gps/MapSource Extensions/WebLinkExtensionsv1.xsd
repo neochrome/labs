@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2006 sp2 U (http://www.altova.com) by Mike Schulze (Garmin International / Engineering) -->
+<xsd:schema xmlns="http://www.garmin.com/xmlschemas/WebLinkExtensions/v1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.garmin.com/xmlschemas/WebLinkExtensions/v1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" xml:lang="en">
+    <xsd:element name="weblink" type="Weblink_t">
+        <xsd:annotation>
+            <xsd:documentation>
+                The root element of every Web Link eXtension (WLX).
+                Currently, a maximum of 50 web links are supported.
+                For best performance, no more than 10 should be used.
+                
+                Each Web Link eXtension requires a unique namespace
+                so it can be identified for updates and such.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="Weblink_t">
+        <xsd:annotation>
+            <xsd:documentation>WebLinkType</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="displayName" type="TokenCollection_t"/>
+            <xsd:element name="wlxNamespace" type="xsd:string"/>
+            <xsd:element name="version" type="xsd:unsignedInt"/>
+            <xsd:element name="creator" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="creatorUrl" type="xsd:anyURI" minOccurs="0"/>
+            <xsd:element name="creationDate" type="xsd:date" minOccurs="0"/>
+            <xsd:element name="updateLocation" type="xsd:anyURI" minOccurs="0"/>
+            <xsd:element name="supportedLanguages" type="SupportedLanguages_t"/>
+            <xsd:element name="url" type="TokenCollection_t"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="TokenCollection_t">
+        <xsd:annotation>
+            <xsd:documentation>Builds link name or URL using Tokens.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="token" type="Token_t" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="SupportedLanguages_t">
+        <xsd:annotation>
+            <xsd:documentation>Determines which languages this web link supports.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="supportedLanguage" type="Language_t" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="Token_t" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation>May be of type Literal_t, LocalizedLiteral_t, Value_t or LocalizedValue_t</xsd:documentation>
+        </xsd:annotation>
+    </xsd:complexType>
+    <xsd:complexType name="Value_t">
+        <xsd:annotation>
+            <xsd:documentation>Defines a value that is the same for all languages.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="Token_t">
+                <xsd:attribute name="format" type="Format_t" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="LocalizedValue_t">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines a value that differs in different languages. 
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="Token_t">
+                <xsd:sequence>
+                    <xsd:element name="value" type="LocalizedFormat_t" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="Literal_t">
+        <xsd:annotation>
+            <xsd:documentation>Defines a constant literal.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="Token_t">
+                <xsd:attribute name="content" type="xsd:string" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="LocalizedLiteral_t">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines a litereral that differs in different languages.  
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="Token_t">
+                <xsd:sequence>
+                    <xsd:element name="content" type="LocalizedString_t" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:simpleType name="Format_t">
+        <xsd:annotation>
+            <xsd:documentation>This holds an enumeration of all possible types and formats that can be extracted from a map position.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="LAT_DEFAULT">
+                <xsd:annotation>
+                    <xsd:documentation>Default format for latitude +-dd.ddd</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LAT_ORIENTATION">
+                <xsd:annotation>
+                    <xsd:documentation>N or S</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LAT_SIGN">
+                <xsd:annotation>
+                    <xsd:documentation>+ for North and - for South</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LAT_DEGREES">
+                <xsd:annotation>
+                    <xsd:documentation>Latitude in dd.dddd</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LAT_DEGREES_FLOOR">
+                <xsd:annotation>
+                    <xsd:documentation>Latitude as integer. floor(degrees)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LAT_MINUTES">
+                <xsd:annotation>
+                    <xsd:documentation>Latitude minutes in mm.mmmm</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LAT_MINUTES_FLOOR">
+                <xsd:annotation>
+                    <xsd:documentation>Latitude minutes as integer floor(minutes)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LAT_SECONDS">
+                <xsd:annotation>
+                    <xsd:documentation>Latitude seconds as ss.ssss</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LAT_SECONDS_ROUND">
+                <xsd:annotation>
+                    <xsd:documentation>Rounded latitude second to nearest integer</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LON_DEFAULT">
+                <xsd:annotation>
+                    <xsd:documentation>Default format for latitude +-dd.ddd</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LON_ORIENTATION">
+                <xsd:annotation>
+                    <xsd:documentation>N or S</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LON_SIGN">
+                <xsd:annotation>
+                    <xsd:documentation>+ for North and - for South</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LON_DEGREES">
+                <xsd:annotation>
+                    <xsd:documentation>Latitude in dd.dddd</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LON_DEGREES_FLOOR">
+                <xsd:annotation>
+                    <xsd:documentation>Latitude as integer. floor(degrees)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LON_MINUTES">
+                <xsd:annotation>
+                    <xsd:documentation>Latitude minutes in mm.mmmm</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LON_MINUTES_FLOOR">
+                <xsd:annotation>
+                    <xsd:documentation>Latitude minutes as integer floor(minutes)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LON_SECONDS">
+                <xsd:annotation>
+                    <xsd:documentation>Latitude seconds as ss.ssss</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="LON_SECONDS_ROUND">
+                <xsd:annotation>
+                    <xsd:documentation>Rounded latitude second to nearest integer</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="FEATURE_NAME">
+                <xsd:annotation>
+                    <xsd:documentation>Name of selected feature</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="ADDRESS_STREET">
+                <xsd:annotation>
+                    <xsd:documentation>Street in selected address</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="ADDRESS_CITY">
+                <xsd:annotation>
+                    <xsd:documentation>City in selected address</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="ADDRESS_STATE">
+                <xsd:annotation>
+                    <xsd:documentation>State in selected address (two letters)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="ADDRESS_ZIP">
+                <xsd:annotation>
+                    <xsd:documentation>Zip in selected address</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="ADDRESS_PHONE">
+                <xsd:annotation>
+                    <xsd:documentation>Phone number of selected address</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:complexType name="LocalizedFormat_t">
+        <xsd:annotation>
+            <xsd:documentation>Element for localization of a format.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="format" type="Format_t" use="required"/>
+        <xsd:attribute name="language" type="Language_t" use="required"/>
+    </xsd:complexType>
+    <xsd:complexType name="LocalizedString_t">
+        <xsd:annotation>
+            <xsd:documentation>Element for localization of a string.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="string" type="xsd:string" use="required"/>
+        <xsd:attribute name="language" type="Language_t" use="required"/>
+    </xsd:complexType>
+    <xsd:simpleType name="Language_t">
+        <xsd:annotation>
+            <xsd:documentation>Supported languages for Garmin software products</xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="CHT">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Traditional Chinese
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="CHS">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Simplified Chinese
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="DAN">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Danish
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="NLD">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Dutch
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="ENU">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        English
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="FIN">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Finnish
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="FRA">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        French
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="DEU">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        German
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="ITA">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Italian
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="JPN">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Japanese
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="KOR">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Korean
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="NOR">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Norwegian
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="PTG">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Portuguese
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="ESP">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Spanish
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="SVE">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Swedish
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="RUS">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Russian
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="ELL">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Greek
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="PLK">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Polish
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="HUN">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Hungarian
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="HRV">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Croatian
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="TRK">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Turkish
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="CSY">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Czech
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="SLV">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Slovenian
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="SKY">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Slovak
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

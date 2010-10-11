@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xrv", "xrv\xrv.csproj", "{D17CCF56-2445-4005-AD10-85F2E33DF01D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xrv.testapp", "xrv.testapp\xrv.testapp.csproj", "{57675198-7CA7-4F4C-9258-6D25E2B00693}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F71737EB-3F03-407E-8E51-A83DF9530FA9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D17CCF56-2445-4005-AD10-85F2E33DF01D}.Debug|x86.ActiveCfg = Debug|x86
+		{D17CCF56-2445-4005-AD10-85F2E33DF01D}.Debug|x86.Build.0 = Debug|x86
+		{D17CCF56-2445-4005-AD10-85F2E33DF01D}.Release|x86.ActiveCfg = Release|x86
+		{D17CCF56-2445-4005-AD10-85F2E33DF01D}.Release|x86.Build.0 = Release|x86
+		{57675198-7CA7-4F4C-9258-6D25E2B00693}.Debug|x86.ActiveCfg = Debug|x86
+		{57675198-7CA7-4F4C-9258-6D25E2B00693}.Debug|x86.Build.0 = Debug|x86
+		{57675198-7CA7-4F4C-9258-6D25E2B00693}.Release|x86.ActiveCfg = Release|x86
+		{57675198-7CA7-4F4C-9258-6D25E2B00693}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

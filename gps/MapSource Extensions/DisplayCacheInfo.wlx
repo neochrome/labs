@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<weblink xmlns="http://www.garmin.com/xmlschemas/WebLinkExtensions/v1">
+  <displayName>
+    <token xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="Literal_t" content="Display cache info on geocaching.com"/>
+  </displayName>
+  <wlxNamespace></wlxNamespace>
+  <version>1</version>
+  <creationDate>2008-09-20</creationDate>
+  <supportedLanguages>
+    <supportedLanguage>ENU</supportedLanguage>
+  </supportedLanguages>
+  <url>
+    <token xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="Literal_t" content="http://www.geocaching.com/seek/cache_details.aspx?wp="/>
+    <token xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="Value_t" format="FEATURE_NAME"/>
+  </url>
+</weblink>
