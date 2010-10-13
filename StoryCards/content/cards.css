@@ -1,0 +1,23 @@
+﻿* { font-family: Verdana }
+body { margin: 0px; padding: 0px; }
+a { float:left; clear: both; padding: 1px 5px 1px 25px; height: 20px; margin: 2px; background-repeat:no-repeat; background-position: left center; opacity: 0.5; cursor: default; }
+a[rel='bug']{ background-image: url('images/bug_icon.png');}
+a[rel='chore']{ background-image: url('images/chore_icon.png');}
+a[rel='feature']{ background-image: url('images/feature_icon.png');}
+a[rel='release']{ background-image: url('images/release_icon.png');}
+.selected { opacity: 1.0; }
+button.print { float:left; clear: both; }
+#for-printing { display: none; background-color: white; position: absolute; width: 297mm; }
+.card { float: left; padding: 5mm; width:12.8cm; min-height: 8.5cm; border: 2mm solid black; position: relative; margin: 3mm; }
+.card { background-repeat: no-repeat; background-position: center; }
+.card.break { clear: both; }
+.card.page-break { page-break-after: always; }
+.card h1 { font-size: 8mm; background-color: rgba(255,255,255,0.8); text-align: center; }
+.card .id { position: absolute; bottom: 5mm; right: 5mm; font-size: 5mm; }
+.card .estimate { position: absolute; bottom: 5mm; left: 5mm; font-size: 1cm; }
+
+.card .id { color: silver; }
+.card .estimate { color: silver; }
+.card.bug { background-image: url('images/bug.png'); }
+.card.chore { background-image: url('images/chore.png'); }
+.card.feature { background-image: url('images/feature.png'); }
