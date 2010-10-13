@@ -1,0 +1,3 @@
+[submodule "StoryCards/lml"]
+	path = StoryCards/lml
+	url = git@github.com:neochrome/lml.git
