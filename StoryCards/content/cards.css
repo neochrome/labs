@@ -8,11 +8,11 @@ a[rel='release']{ background-image: url('images/release_icon.png');}
 .selected { opacity: 1.0; }
 button.print { float:left; clear: both; }
 #for-printing { display: none; background-color: white; position: absolute; width: 297mm; }
-.card { float: left; padding: 5mm; width:12.8cm; min-height: 8.5cm; border: 2mm solid black; position: relative; margin: 3mm; }
+.card { float: left; padding: 5mm; width:12.5cm; min-height: 8.3cm; border: 2mm solid black; position: relative; margin: 2mm 0 0 2mm; }
 .card { background-repeat: no-repeat; background-position: center; }
 .card.break { clear: both; }
 .card.page-break { page-break-after: always; }
-.card h1 { font-size: 8mm; background-color: rgba(255,255,255,0.8); text-align: center; }
+.card h1 { font-size: 6mm; background-color: rgba(255,255,255,0.8); text-align: center; }
 .card .id { position: absolute; bottom: 5mm; right: 5mm; font-size: 5mm; }
 .card .estimate { position: absolute; bottom: 5mm; left: 5mm; font-size: 1cm; }
 
