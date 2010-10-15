@@ -1,61 +1,38 @@
-﻿#load "lml/lml.fsx"
-#r "System.Xml.Linq"
-open System
+﻿open System
+open System.IO
 open System.Net
-open System.Xml.Linq
+open System.Xml
+open System.Xml.Xsl
 
 type String with member this.With([<System.ParamArray>]v) = String.Format(this, v)
-let (!) (n:string) = XName.op_Implicit(n)
-let (?) (elm: XElement) (name: string) : string = elm.Element(!name).Value
-let (>>) (elm: XElement) (name: string) = elm.Descendants(!name)
-let (@) (elm: XElement) (name: string) : string = elm.Attribute(!name).Value
 
 let get (url:string) (headers:seq<string * string>) =
     use client = new WebClient()
     headers |> Seq.iter (fun (header,value) -> client.Headers.Add(header, value))
     client.DownloadString(url)
 
-type Settings = { token: string; id: int }
-type Card = { id: string; title: string; estimate: string; kind: string }
+let usage(message) = 
+  printfn "%s\nUsage:\ncards <token> <projectid> <done|current|backlog>" message
+  exit 1
 
-type Stories =
-| Done
-| Current
-| Backlog
-  override this.ToString() =
-    match this with
-    | Done -> "done"
-    | Current -> "current"
-    | Backlog -> "backlog"
-  member this.from (settings: Settings) =
-    let url = "http://www.pivotaltracker.com/services/v3/projects/{0}/iterations/{1}"
-    let xml = get (url.With(settings.id, this.ToString())) [("X-TrackerToken", settings.token)]
-    XDocument.Parse(xml).Root >> "story"
-    |> Seq.map (fun story -> { id = story?id; title = story?name; kind = story?story_type; estimate = (if story?story_type = "feature" then story?estimate else "") })
+let args = fsi.CommandLineArgs
+if args.Length <> 4 then usage("Invalid number of arguments")
 
+let token = args.[1]
 
-let as_card story =
-  T?a <- [
-    &"{0} - {1}".With(story.id, story.title);
-    "id"=>story.id;
-    "rel"=>story.kind;
-    "title"=>story.title;
-    "rev"=>story.estimate;
-  ]
+let projectId =
+  match Int32.TryParse(args.[2]) with
+  | (true, n) -> n
+  | _ -> usage(sprintf "ProjectId must be numerical: %s" args.[2])
 
-let cards_for stories = 
-  T?html <- [
-    T?head <- [
-      T?title <- "StoryCards";
-      T?script <- ["src"=>"content/jquery.min.js";"type"=>"text/javascript"];
-      T?script <- ["src"=>"content/cards.js";"type"=>"text/javascript"];
-      T?link <- ["href"=>"content/cards.css";"type"=>"text/css";"rel"=>"stylesheet"];
-    ];
-    T?body <- [
-      T?div <- [
-        "id"=>"selection";
-        T?button <- ["class"=>"print";&"print selected"];
-      ] |> Seq.append (stories |> Seq.map as_card);
-      T?div <- ["id"=>"for-printing"];
-    ]
-  ]
+let iteration =
+  match args.[3] with
+  | "done" | "current" | "backlog" -> args.[3]
+  | _ -> usage(sprintf "Invalid iteration: %s" args.[3])
+
+let xml = get ("http://www.pivotaltracker.com/services/v3/projects/{0}/iterations/{1}".With(projectId, iteration)) [("X-TrackerToken", token)]
+let xslt = new XslCompiledTransform()
+xslt.Load("cards.xslt")
+let xsltArgs = new XsltArgumentList()
+xsltArgs.AddParam("iteration", "", iteration)
+using (XmlTextReader.Create(new StringReader(xml))) (fun reader -> xslt.Transform(reader, xsltArgs, Console.Out))
