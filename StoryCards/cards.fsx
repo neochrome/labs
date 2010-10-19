@@ -35,4 +35,4 @@ using (XmlTextReader.Create(new StringReader(get url token))) (fun reader ->
   xslt.Load("cards.xslt")
   let args = new XsltArgumentList()
   args.AddParam("iteration", "", iteration)
-  xslt.Transform(reader, args, Console.Out))
+  xslt.Transform(reader, args, XmlWriter.Create(Console.Out, xslt.OutputSettings)))
