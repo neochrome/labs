@@ -9,15 +9,12 @@ a[rel='release']{ background-image: url('images/release_icon.png');}
 button.print { float:left; clear: both; }
 #for-printing { display: none; background-color: white; position: absolute; width: 297mm; }
 .card { float: left; padding: 5mm; width:12.5cm; min-height: 8.3cm; border: 2mm solid black; position: relative; margin: 2mm 0 0 2mm; }
-.card { background-repeat: no-repeat; background-position: center; }
+.card { overflow: hidden; }
 .card.break { clear: both; }
 .card.page-break { page-break-after: always; }
-.card h1 { font-size: 6mm; background-color: white; opacity: 0.8; filter:alpha(opacity=80); text-align: center; }
+.card h1 { font-size: 6mm; background-color: white; opacity: 0.8; filter:alpha(opacity=80); text-align: center; position: absolute; }
 .card .id { position: absolute; bottom: 5mm; right: 5mm; font-size: 5mm; }
 .card .estimate { position: absolute; bottom: 5mm; left: 5mm; font-size: 1cm; }
-
+.card img { position: absolute; height:100%; margin: -2.5mm; margin-left: 15mm;}
 .card .id { color: silver; }
 .card .estimate { color: silver; }
-.card.bug { background-image: url('images/bug.png'); }
-.card.chore { background-image: url('images/chore.png'); }
-.card.feature { background-image: url('images/feature.png'); }

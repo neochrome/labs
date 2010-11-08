@@ -18,12 +18,16 @@ $(function () {
 });
 
 function createCard(index, id, type, estimate, title) {
+	var image = '<img src="content/images/'+ type +'.png"/>';
+	var heading = '<h1>' + title + '</h1>';
+	var points = '<div class="estimate">' + estimate + '</div>';
+	var number = '<div class="id">' + id + '</div>';
 	switch (index % 4) {
 		case 0:
 		case 2:
-			card = $('<div class="card break ' + type + '"></div>'); break;
-		case 3: card = $('<div class="card page-break ' + type + '"></div>'); break;
-		default: card = $('<div class="card ' + type + '"></div>'); break;
+			card = $('<div class="card break"></div>'); break;
+		case 3: card = $('<div class="card page-break"></div>'); break;
+		default: card = $('<div class="card"></div>'); break;
 	}
-	return card.append('<h1>' + title + '</h1><div class="estimate">' + estimate + '</div><div class="id">' + id + '</div>');
+	return card.append(image + heading + points + number);
 }
