@@ -1,0 +1,19 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Bake">
+
+	<Target Name="Bake">
+		<ItemGroup Condition="'$(Bake)' == ''">
+			<Bake Include="**\*.js" Exclude="**\*.min.js"/>
+		</ItemGroup>
+		<PropertyGroup Condition="'$(Baked)' == ''">
+			<Baked>$(MSBuildProjectName).min.js</Baked>
+		</PropertyGroup>
+		<ReadLinesFromFile File="%(Bake.Identity)">
+			<Output TaskParameter="Lines" ItemName="BakedLines"/>
+		</ReadLinesFromFile>
+		<Message Text="$(Baked):"/>
+		<Message Text="  %(Bake.Identity)"/>
+		<WriteLinesToFile File="$(Baked)" Lines="@(BakedLines)" Overwrite="true"/>
+	</Target>
+
+</Project>
+
