@@ -1,4 +1,6 @@
 ﻿(function () {
+	if(window.namespace)
+		throw "window.namespace already taken!";
 	window.namespace = function (namespace, declaration) {
 		var parts = namespace.split('.');
 		var context = window;
