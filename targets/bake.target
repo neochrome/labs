@@ -3,11 +3,13 @@
 	<!-- Example Usage:
 	<Import Project="bake.target" />
 	<ItemGroup>
-		<Bake Include="content\scripts\**\*.js" Exclude="**\*.min.js">
+		<Bake Include="content\scripts\**\*.js" Exclude="**\*.min.js;**\*.controller.js">
 			<Baked>content\scripts\$(MSBuildProjectName.ToLower()).min.js</Baked>
+			<InProject>false</InProject>
 		</Bake>
 		<Bake Include="content\scripts\**\*.controller.js" Exclude="**\*.min.js">
 			<Baked>content\scripts\$(MSBuildProjectName.ToLower()).controllers.min.js</Baked>
+			<InProject>false</InProject>
 		</Bake>
 	</ItemGroup>
 	<Target Name="BeforeBuild">
