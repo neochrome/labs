@@ -1,18 +1,50 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Bake">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-	<Target Name="Bake">
-		<ItemGroup Condition="'$(Bake)' == ''">
-			<Bake Include="**\*.js" Exclude="**\*.min.js"/>
-		</ItemGroup>
-		<PropertyGroup Condition="'$(Baked)' == ''">
-			<Baked>$(MSBuildProjectName).min.js</Baked>
-		</PropertyGroup>
+	<!-- Example Usage:
+	<Import Project="bake.target" />
+	<ItemGroup>
+		<Bake Include="content\scripts\**\*.js" Exclude="**\*.min.js;**\*.controller.js">
+			<Baked>content\scripts\$(MSBuildProjectName.ToLower()).min.js</Baked>
+			<InProject>false</InProject>
+		</Bake>
+		<Bake Include="content\scripts\**\*.controller.js" Exclude="**\*.min.js">
+			<Baked>content\scripts\$(MSBuildProjectName.ToLower()).controllers.min.js</Baked>
+			<InProject>false</InProject>
+		</Bake>
+	</ItemGroup>
+	<Target Name="BeforeBuild">
+		<CallTarget Targets="Bake" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' "/>
+		<CallTarget Targets="BakeAndMinify" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' "/>
+	</Target>
+	<Target Name="BeforeReBuild">
+		<CallTarget Targets="BakedClean"/>
+	</Target>
+	-->
+
+	<Target Name="Bake" Inputs="@(Bake)" Outputs="%(Bake.Baked)">
+		<Error Text="Missing item(s) to bake. Please specify Bake-items." Condition="'@(Bake)' == ''"/>
+
+		<Message Text="%(Bake.Baked):"/>
+		<Message Text="  %(Bake.Identity)"/>
+
 		<ReadLinesFromFile File="%(Bake.Identity)">
 			<Output TaskParameter="Lines" ItemName="BakedLines"/>
 		</ReadLinesFromFile>
-		<Message Text="$(Baked):"/>
+		<WriteLinesToFile File="%(Bake.Baked)" Lines="@(BakedLines)" Overwrite="true"/>
+	</Target>
+
+	<Target Name="BakeAndMinify" Inputs="@(Bake)" Outputs="%(Bake.Baked)">
+		<Error Text="Missing item(s) to bake. Please specify Bake-items." Condition="'@(Bake)' == ''"/>
+
+		<Message Text="%(Bake.Baked):"/>
 		<Message Text="  %(Bake.Identity)"/>
-		<WriteLinesToFile File="$(Baked)" Lines="@(BakedLines)" Overwrite="true"/>
+
+		<Exec Command="java -jar $(MSBuildThisFileDirectory)compiler.jar --js_output_file %(Bake.Baked) @(Bake->'--js %(Identity)', ' ')"/>
+		<OnError ExecuteTargets="BakedClean"/>
+	</Target>
+	
+	<Target Name="BakedClean">
+		<Delete Files=" %(Bake.Baked)"/>
 	</Target>
 
 </Project>
