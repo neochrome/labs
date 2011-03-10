@@ -13,8 +13,8 @@
 		</Bake>
 	</ItemGroup>
 	<Target Name="BeforeBuild">
-		<CallTarget Targets="Bake" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' "/>
-		<CallTarget Targets="BakeAndMinify" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' "/>
+		<CallTarget Targets="Bake" Condition=" '$(Configuration)' == 'Debug' "/>
+		<CallTarget Targets="BakeAndMinify" Condition=" '$(Configuration)' == 'Release' "/>
 	</Target>
 	<Target Name="BeforeReBuild">
 		<CallTarget Targets="BakedClean"/>
@@ -31,6 +31,13 @@
 			<Output TaskParameter="Lines" ItemName="BakedLines"/>
 		</ReadLinesFromFile>
 		<WriteLinesToFile File="%(Bake.Baked)" Lines="@(BakedLines)" Overwrite="true"/>
+		
+		<ItemGroup>		
+			<Content Remove="@(Bake)" />
+			<Content Include="%(Bake.Baked)" />
+		</ItemGroup>
+		
+		<OnError ExecuteTargets="BakedClean"/>
 	</Target>
 
 	<Target Name="BakeAndMinify" Inputs="@(Bake)" Outputs="%(Bake.Baked)">
@@ -40,6 +47,12 @@
 		<Message Text="  %(Bake.Identity)"/>
 
 		<Exec Command="java -jar $(MSBuildThisFileDirectory)compiler.jar --js_output_file %(Bake.Baked) @(Bake->'--js %(Identity)', ' ')"/>
+		
+		<ItemGroup>		
+			<Content Remove="@(Bake)" />
+			<Content Include="%(Bake.Baked)" />
+		</ItemGroup>
+		
 		<OnError ExecuteTargets="BakedClean"/>
 	</Target>
 	
