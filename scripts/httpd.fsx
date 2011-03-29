@@ -10,9 +10,9 @@ let (|Grep|_|) expr input =
   else
     None
 
-let server processor =
+let server port processor =
   async{
-    let listener = new TcpListener(IPAddress.Loopback, 80)
+    let listener = new TcpListener(IPAddress.Loopback, port)
     listener.Start()
     while true do
       let client = listener.AcceptTcpClient()
@@ -34,11 +34,17 @@ let fileserve (request: StreamReader) (response: NetworkStream) =
       response.Flush()
   | _ -> printfn "unknown request"
 
-printfn "Listening on port 80. Press ESC to quit"
-Async.Start(server fileserve)
-while (Console.ReadKey(true).Key <> ConsoleKey.Escape) do ()
-Async.CancelDefaultToken
 
 
+let start port =
+  printfn "Listening on port %d. Press ESC to quit" port
+  Async.Start(server port fileserve)
+  while (Console.ReadKey(true).Key <> ConsoleKey.Escape) do ()
+  Async.CancelDefaultToken
 
 
+let args = (fsi.CommandLineArgs |> Array.toList).Tail
+if args.IsEmpty then
+  start 8080
+else
+  start (Int32.Parse(args.Head))
