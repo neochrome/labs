@@ -12,6 +12,3 @@ fs.readdir('.', function(err, files){
 		watch(files[i]);
 	}
 });
-
-
-
