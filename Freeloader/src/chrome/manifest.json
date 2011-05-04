@@ -2,13 +2,13 @@
 	"name":"Freeloader",
 	"version":"1.0",
 	"description":"Page reloader",
-	"icons":{"128":"icon.png"},
-	"background_page":"background.html",
+	"icons":{"128":"images/icon.png"},
+	"background_page":"src/background.html",
 	"permissions":[
 		"tabs",
 		"http://localhost/"
 	],
 	"browser_action":{
-		"default_icon":"icon-disabled.png"
+		"default_icon":"images/icon-disabled.png"
 	}
 }
