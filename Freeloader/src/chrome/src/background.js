@@ -54,17 +54,20 @@ var icon = {
 };
 
 
-var states = Stately.machine({
-	NEW:{
-		start:function(){
-			return this.DISABLED;
-		}
-	},
+var states = fsm({
 	DISABLED:{
 		toggle: function(){
 			icon.enabled();
 			comet.launch();
 			return this.ENABLED;
+		},
+		success:function(){
+			comet.stop();
+			return this.DISABLED;
+		},
+		fail:function(){
+			comet.stop();
+			return this.DISABLED;
 		}
 	},
 	ENABLED:{
@@ -84,21 +87,21 @@ var states = Stately.machine({
 		}
 	},
 	FAILED:{
-		fail:function(){
-			return this.FAILED;
+		toggle:function(){
+			icon.disabled();
+			comet.stop();
+			return this.DISABLED;
 		},
 		success:function(){
 			icon.enabled();
 			refresh();
 			return this.ENABLED;
 		},
-		toggle:function(){
-			icon.disabled();
-			comet.stop();
-			return this.DISABLED;
+		fail:function(){
+			return this.FAILED;
 		}
 	}
-});
+}).DISABLED();
 
 var refresh = function(){
 	chrome.windows.getCurrent(function(window){
@@ -113,7 +116,6 @@ chrome.browserAction.onClicked.addListener(function(tab){
 });
 
 var comet = Comet.poll('http://localhost:1337/')
-	.data(states.success)
-	.error(states.fail);
+	.data(function(){ states.success(); })
+	.error(function(){ states.fail(); });
 
-states.start();
