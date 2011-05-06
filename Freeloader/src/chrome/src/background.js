@@ -5,7 +5,7 @@ var Comet = function(url){
 	this.errorCallback = function(){};
 };
 Comet.poll = function(url){
-	return new Comet(url);
+	return new Comet(url());
 };
 Comet.prototype.data = function(callback){
 	this.dataCallback = callback;
@@ -76,9 +76,12 @@ var states = fsm({
 			comet.stop();
 			return this.DISABLED;
 		},
-		success:function(){
-			icon.enabled();
-			refresh();
+		success:function(data){
+			var lastUpdate = int.parse(data, 10);
+			if(lastSeen < lastUpdate){
+				lastSeen = lastUpdate;
+				refresh();
+			}
 			return this.ENABLED;
 		},
 		fail:function(){
@@ -115,7 +118,8 @@ chrome.browserAction.onClicked.addListener(function(tab){
 	states.toggle();
 });
 
-var comet = Comet.poll('http://localhost:1337/')
-	.data(function(){ states.success(); })
+var lastSeen = 0;
+var comet = Comet.poll(function(){ return 'http://localhost:1337/?' + lastSeen; })
+	.data(function(data){ states.success(data); })
 	.error(function(){ states.fail(); });
 
