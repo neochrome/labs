@@ -21,12 +21,18 @@ var http = require('http');
 var url = require('url');
 http.createServer(function (req, res) {
 	res.writeHead(200, {'Content-Type': 'text/plain', 'Access-Control-Allow-Origin':'*'});
+	
+	if(req.url === '/sync'){
+		sendReloadNotificationTo(res);
+		return;
+	}
+	
+	query = url.parse(req.url, true).query;
 	var connection = {
-		lastSeen: url.parse(req.url).query || 0,
+		lastChange: parseInt(query.lastChange || '0'),
 		response: res
 	};
 	connections.unshift(connection);
-	console.log(connection.lastSeen);
 
 	setTimeout(function(){
 		connection.response.end('');
@@ -37,21 +43,25 @@ http.createServer(function (req, res) {
 }).listen(1337);
 
 watchIn('.', '*', function(file){
-	console.log('"' + file + '" was changed');
 	lastChange = new Date().getTime();
+	console.log('"' + file + '" was changed at ' + lastChange);
 });
 
-var notifyReload = function(){
+var sendReloadNotificationTo = function(response){
+	response.end(JSON.stringify({lastChange:lastChange}));
+};
+
+var processConnections = function(){
 	connections = connections.filter(function(connection){
-		if(connection.lastSeen < lastChange){
-			connection.response.end(lastChange.toString());
+		if(connection.lastChange < lastChange){
+			sendReloadNotificationTo(connection.response);
 			return false;
 		}
 	 	return true;
 	});
-	setTimeout(notifyReload, 500);
+	setTimeout(processConnections, 500);
 };
-notifyReload();
+processConnections();
 
 console.log('Server running at port: 1337');
 console.log('Press ctrl+c to exit');
