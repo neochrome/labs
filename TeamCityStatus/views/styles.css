@@ -28,9 +28,9 @@ li {
 }
 
 li.success {
-	background-image: url('success.gif');
+	background-image: url('../images/success.gif');
 }
 
 li.failure {
-	background-image: url('failure.gif');
+	background-image: url('../images/failure.gif');
 }

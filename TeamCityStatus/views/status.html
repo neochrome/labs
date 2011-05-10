@@ -1,5 +1,5 @@
-<script src="jquery-1.5.2.min.js" type="text/javascript"></script>
-<script src="jquery.tmpl.min.js" type="text/javascript"></script>
+<script src="../lib/jquery-1.5.2.min.js" type="text/javascript"></script>
+<script src="../lib/jquery.tmpl.min.js" type="text/javascript"></script>
 <link href="styles.css" rel="Stylesheet" type="text/css"/>
 
 <script id="template" type="text/x-jquery-tmpl">
@@ -23,6 +23,6 @@
 		.appendTo('#content');
 	$('#content li a').click(function(event){
 		event.preventDefault();
-		chrome.tabs.create({url:$(this).attr('href')});
+		chrome.extension.getBackgroundPage().openTab($(this).attr('href'));
 	});
 </script>

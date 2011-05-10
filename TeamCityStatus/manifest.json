@@ -1,0 +1,19 @@
+{
+	"name":"Team City Status",
+	"version":"1.0",
+	"description":"Team City build status notifier",
+	"icons":{
+		"32":"images/icon32.png",
+		"128":"images/icon128.png"
+	},
+	"background_page":"views/background.html",
+	"permissions":[
+		"http://*/",
+		"tabs",
+		"notifications"
+	],
+	"browser_action":{
+		"default_icon":"images/icon32.png"
+	},
+	"options_page":"views/options.html"
+}
