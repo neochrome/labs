@@ -5,7 +5,6 @@
 	"icons":{"128":"icon128.png"},
 	"background_page":"background.html",
 	"permissions":[
-		"notifications",
 		"http://*/"
 	],
 	"browser_action":{

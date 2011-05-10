@@ -5,7 +5,11 @@
 <script id="template" type="text/x-jquery-tmpl">
 	<ul>
 		{{each(i, build) builds}}
-		<li class="${build.status}">${build.projectName} - ${build.name}</li>
+		<li class="${build.status}">
+			<a href="${build.webUrl}">
+				${build.projectName} - ${build.name}
+			</a>
+		</li>
 		{{/each}}
 	</ul>
 </script>
@@ -17,4 +21,8 @@
 	$('#template')
 		.tmpl({builds:chrome.extension.getBackgroundPage().builds})
 		.appendTo('#content');
+	$('#content li a').click(function(event){
+		event.preventDefault();
+		chrome.tabs.create({url:$(this).attr('href')});
+	});
 </script>
