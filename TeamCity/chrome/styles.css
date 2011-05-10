@@ -1,0 +1,16 @@
+@import url("reset.css");
+
+li {
+	display: block;
+	padding: 1px 1px 1px 18px;
+	height: 18px;
+	white-space: nowrap;
+}
+
+li.success {
+	background: url("success.gif") no-repeat;
+}
+
+li.failure {
+	background: url("failure.gif") no-repeat;
+}

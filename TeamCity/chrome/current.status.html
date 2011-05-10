@@ -1,0 +1,20 @@
+<script src="jquery-1.5.2.min.js" type="text/javascript"></script>
+<script src="jquery.tmpl.min.js" type="text/javascript"></script>
+<link href="styles.css" rel="Stylesheet" type="text/css"/>
+
+<script id="template" type="text/x-jquery-tmpl">
+	<ul>
+		{{each(i, build) builds}}
+		<li class="${build.status}">${build.projectName} - ${build.name}</li>
+		{{/each}}
+	</ul>
+</script>
+
+<div id="content"></div>
+
+<script type="text/javascript">
+	$('#content').empty();
+	$('#template')
+		.tmpl({builds:chrome.extension.getBackgroundPage().builds})
+		.appendTo('#content');
+</script>
