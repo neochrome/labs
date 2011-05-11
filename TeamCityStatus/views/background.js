@@ -59,12 +59,13 @@ var defaultOptions = {
 var builds = [];
 
 var update = function(){
+	var buildsUpdated = [];
 	var todo = [];
 	var buildTypesUrl = localStorage.baseUrl + '/httpAuth/app/rest/buildTypes';
 
 	$.getJSON(buildTypesUrl)
 		.success(function(data){
-			builds = data.buildType.slice();
+			buildsUpdated = data.buildType.slice();
 			todo = data.buildType.slice();
 
 			icon.enabled();
@@ -93,7 +94,7 @@ var update = function(){
 		$.getJSON(buildsUrl)
 			.success(function(data){
 				var build = data.build[0];
-				builds.forEach(function(buildType){
+				buildsUpdated.forEach(function(buildType){
 					if(build.buildTypeId === buildType.id){
 						buildType.status = build.status === 'SUCCESS' ? 'success' : 'failure';
 					}
@@ -106,6 +107,7 @@ var update = function(){
 	};
 
 	var updateCompleted = function(){
+		builds = buildsUpdated;
 		var failed = 0;
 		builds.forEach(function(x){
 			if(x.status === 'failure'){ failed++; }
