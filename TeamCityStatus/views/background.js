@@ -1,10 +1,4 @@
 var icon = {
-	success: function(){
-		this._set('success32.png');
-	},
-	failure: function(){
-		this._set('failure32.png');
-	},
 	enabled: function(){
 		this._set('icon32.png');
 	},
@@ -21,9 +15,13 @@ var badge = {
 		this._text('?');
 		this._color([190,190,190,230]);
 	},
+	success: function(){
+		this._text('ok');
+		this._color([0,255,0,230]);
+	},
 	failed: function(count){
 		this._text(count.toString());
-		this._color([255,0,0,255]);
+		this._color([255,0,0,230]);
 	},
 	clear: function(){
 		this._text('');
@@ -110,8 +108,8 @@ var update = function(){
 		builds.forEach(function(x){
 			if(x.status === 'failure'){ failed++; }
 	 	});
-		failed ? icon.failure() : icon.success;
-		failed > 1 ? badge.failed(failed) : badge.clear();
+		icon.enabled()
+		failed > 0 ? badge.failed(failed) : badge.success();
 	};
 
 };
