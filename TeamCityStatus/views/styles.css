@@ -34,3 +34,7 @@ li.success {
 li.failure {
 	background-image: url('../images/failure.gif');
 }
+
+#settings label, #settings button{
+	display: block;
+}

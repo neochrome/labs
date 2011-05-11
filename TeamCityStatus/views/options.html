@@ -1,18 +1,36 @@
 <script src="../lib/jquery-1.5.2.min.js" type="text/javascript"></script>
+<link href="styles.css" rel="Stylesheet" type="text/css"/>
 
-<h1>Team City build status notifier</h1>
-<h2>Settings</h2>
-<label for="base-url" style="display: block">Base url (including basic auth)</label>
-<input id="base-url" name="base-url" type="text"/>
-<button onclick="save()">Save</button>
-<div id="saved" style="display: none">Saved</div>
+<h1>Team City Status</h1>
+<fieldset id="settings">
+	<legend>Settings</legend>
+
+	<label for="base-url">Base url (including basic auth)</label>
+	<input id="base-url" name="base-url" type="text"/>
+	
+	<label for="refresh-interval">Refresh interval</label>
+	<input id="refresh-interval" name="refresh-interval" type="text"/> ms
+	
+	<label for="retry-interval">Retry interval</label>
+	<input id="retry-interval" name="retry-interval" type="text"/> ms
+	
+	<button onclick="save()">Save</button>
+
+	<div id="saved" style="display: none">Saved</div>
+</fieldset>
 
 <script type="text/javascript">
 	$(function(){
-		$('#base-url').val(localStorage.baseUrl || '');
+		var defaultOptions = chrome.extension.getBackgroundPage().defaultOptions;
+		$('#base-url').val(localStorage.baseUrl || defaultOptions.baseUrl);
+		$('#refresh-interval').val(localStorage.refreshInterval || defaultOptions.refreshInterval);
+		$('#retry-interval').val(localStorage.retryInterval || defaultOptions.retryInterval);
 	});
 	function save(){
 		localStorage.baseUrl = $('#base-url').val();
+		localStorage.refreshInterval = $('#refresh-interval').val();
+		localStorage.retryInterval = $('#retry-interval').val();
+		
 		$('#saved').fadeIn('fast');
 		chrome.extension.getBackgroundPage().update();
 	}

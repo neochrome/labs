@@ -50,7 +50,11 @@ var openTab = function(url){
 	chrome.tabs.create({url:url});
 };
 
-
+var defaultOptions = {
+	baseUrl: '',
+	refreshInterval: 40000,
+	retryInterval: 10000
+};
 
 var builds = [];
 
@@ -64,11 +68,9 @@ var update = function(){
 			todo = data.buildType.slice();
 
 			icon.enabled();
-			badge.unknown();
 			action.status();
 
 			updateStatuses();
-			setTimeout(update, localStorage.successRefreshInterval || 60000);
 		})
 	.error(function(){
 		console.error('failed to retrieve build types from: ' + buildTypesUrl);
@@ -77,7 +79,7 @@ var update = function(){
 		badge.unknown();
 		action.options();
 
-		setTimeout(update, localStorage.errorRefreshInterval || 10000);
+		setTimeout(update, localStorage.retryInterval || defaultOptions.retryInterval);
 	});
 
 	var updateStatuses = function(){
@@ -110,8 +112,11 @@ var update = function(){
 	 	});
 		icon.enabled()
 		failed > 0 ? badge.failed(failed) : badge.success();
+		
+		setTimeout(update, localStorage.refreshInterval || defaultOptions.refreshInterval);
 	};
 
 };
 
+badge.unknown();
 update();
