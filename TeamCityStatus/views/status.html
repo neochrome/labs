@@ -14,14 +14,14 @@
 	</ul>
 </script>
 
-<div id="content"></div>
+<div id="status"></div>
 
 <script type="text/javascript">
-	$('#content').empty();
+	$('#status').empty();
 	$('#template')
 		.tmpl({builds:chrome.extension.getBackgroundPage().builds})
-		.appendTo('#content');
-	$('#content li a').click(function(event){
+		.appendTo('#status');
+	$('#status li a').click(function(event){
 		event.preventDefault();
 		chrome.extension.getBackgroundPage().openTab($(this).attr('href'));
 	});

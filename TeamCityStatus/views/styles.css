@@ -6,18 +6,16 @@ body {
 	padding: 5px;
 }
 
-li a {
+#status li a {
 	text-decoration: none;
 	display: block;
 	color: #000;
 	padding: 2px;
 	border-radius: 3px;
 }
-li a:hover{
-	background-color: #eee;
-}
+#status li a:hover { background-color: #eee; }
 
-li {
+#status li {
 	display: block;
 	padding: 1px 1px 1px 20px;
 	margin: 2px;
@@ -27,14 +25,9 @@ li {
 	background-repeat: no-repeat;
 }
 
-li.success {
-	background-image: url('../images/success.gif');
-}
+#status li.success { background-image: url('../images/success.gif'); }
+#status li.failure { background-image: url('../images/failure.gif'); }
 
-li.failure {
-	background-image: url('../images/failure.gif');
-}
-
-#settings label, #settings button{
+#options label, #options button{
 	display: block;
 }
