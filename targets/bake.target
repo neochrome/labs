@@ -1,64 +1,115 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 	<!-- Example Usage:
 	<Import Project="bake.target" />
 	<ItemGroup>
-		<Bake Include="content\scripts\**\*.js" Exclude="**\*.min.js;**\*.controller.js">
+		<JavaScript Include="content\scripts\**\*.js" Exclude="**\*.min.js;**\*.controller.js">
 			<Baked>content\scripts\$(MSBuildProjectName.ToLower()).min.js</Baked>
 			<InProject>false</InProject>
-		</Bake>
-		<Bake Include="content\scripts\**\*.controller.js" Exclude="**\*.min.js">
+		</JavaScript>
+		<JavaScript Include="content\scripts\**\*.controller.js" Exclude="**\*.min.js">
 			<Baked>content\scripts\$(MSBuildProjectName.ToLower()).controllers.min.js</Baked>
 			<InProject>false</InProject>
-		</Bake>
+		</JavaScript>
+		<Css Include="main.css">
+			<Baked>main.min.css</Baked>
+			<InProject>false</InProject>
+		</Css>
 	</ItemGroup>
+
 	<Target Name="BeforeBuild">
-		<CallTarget Targets="Bake" Condition=" '$(Configuration)' == 'Debug' "/>
-		<CallTarget Targets="BakeAndMinify" Condition=" '$(Configuration)' == 'Release' "/>
+		<CallTarget Targets="BakeJs" Condition=" '$(Configuration)' == 'Debug' "/>
+		<CallTarget Targets="BakeAndMinifyJs" Condition=" '$(Configuration)' == 'Release' "/>
+		<CallTarget Targets="BakeAndMinifyCss" Condition=" '$(Configuration)' == 'Release' "/>
 	</Target>
 	<Target Name="BeforeReBuild">
-		<CallTarget Targets="BakedClean"/>
+		<CallTarget Targets="BakeClean"/>
 	</Target>
 	-->
 
-	<Target Name="Bake" Inputs="@(Bake)" Outputs="%(Bake.Baked)">
-		<Error Text="Missing item(s) to bake. Please specify Bake-items." Condition="'@(Bake)' == ''"/>
+	<Target Name="BakeJs" Inputs="@(JavaScript)" Outputs="%(JavaScript.Baked) Condition="'@(JavaScript)' != ''">
+		<Error Text="%(JavaScript.Identity) is missing the Baked metadata" Condition="'%(JavaScript.Baked)' == ''"/>
 
-		<Message Text="%(Bake.Baked):"/>
-		<Message Text="  %(Bake.Identity)"/>
+		<Message Text="%(JavaScript.Baked):"/>
+		<Message Text="  %(JavaScript.Identity)"/>
 
-		<ReadLinesFromFile File="%(Bake.Identity)">
-			<Output TaskParameter="Lines" ItemName="BakedLines"/>
+		<ReadLinesFromFile File="%(JavaScript.Identity)">
+			<Output TaskParameter="Lines" ItemName="Content"/>
 		</ReadLinesFromFile>
-		<WriteLinesToFile File="%(Bake.Baked)" Lines="@(BakedLines)" Overwrite="true"/>
+		<WriteLinesToFile File="%(JavaScript.Baked)" Lines="@(Content)" Overwrite="true"/>
 		
 		<ItemGroup>		
-			<Content Remove="@(Bake)" />
-			<Content Include="%(Bake.Baked)" />
+			<Content Remove="@(JavaScript)" />
+			<Content Include="%(JavaScript.Baked)" />
 		</ItemGroup>
 		
-		<OnError ExecuteTargets="BakedClean"/>
+		<OnError ExecuteTargets="BakeClean"/>
 	</Target>
 
-	<Target Name="BakeAndMinify" Inputs="@(Bake)" Outputs="%(Bake.Baked)">
-		<Error Text="Missing item(s) to bake. Please specify Bake-items." Condition="'@(Bake)' == ''"/>
+	<Target Name="BakeAndMinifyJs" Inputs="@(JavaScript)" Outputs="%(JavaScript.Baked) Condition="'@(JavaScript)' != ''">
+		<Error Text="%(JavaScript.Identity) is missing the Baked metadata" Condition="'%(JavaScript.Baked)' == ''"/>
 
-		<Message Text="%(Bake.Baked):"/>
-		<Message Text="  %(Bake.Identity)"/>
+		<Message Text="%(JavaScript.Baked):"/>
+		<Message Text="  %(JavaScript.Identity)"/>
 
-		<Exec Command="java -jar $(MSBuildThisFileDirectory)compiler.jar --js_output_file %(Bake.Baked) @(Bake->'--js %(Identity)', ' ')"/>
+		<Exec Command="java -jar $(MSBuildThisFileDirectory)compiler.jar --js_output_file %(JavaScript.Baked) @(JavaScript->'--js %(Identity)', ' ')"/>
 		
 		<ItemGroup>		
-			<Content Remove="@(Bake)" />
-			<Content Include="%(Bake.Baked)" />
+			<Content Remove="@(JavaScript)" />
+			<Content Include="%(JavaScript.Baked)" />
 		</ItemGroup>
 		
-		<OnError ExecuteTargets="BakedClean"/>
+		<OnError ExecuteTargets="BakeClean"/>
 	</Target>
 	
-	<Target Name="BakedClean">
-		<Delete Files=" %(Bake.Baked)"/>
+	<Target Name="BakeClean">
+		<Delete Files=" %(JavaScript.Baked)"/>
+		<Delete Files=" %(Css.Baked)"/>
 	</Target>
+	
+	<Target Name="BakeAndMinifyCss" Inputs="@(Css)" Outputs="%(Css.Baked)" Condition="'@(Css)' != ''">
+		<Error Text="%(Css.Identity) is missing the Baked metadata" Condition="'%(Css.Baked)' == ''"/>
+		<Message Text="%(Css.Baked):"/>
+		<Message Text="  %(Css.Identity)"/>
+		
+		<CssInlineImports File="%(Css.Identity)">
+			<Output ItemName="InlinedContent" TaskParameter="Content"/>
+		</CssInlineImports>
+		<WriteLinesToFile File="%(Css.Baked)" Lines="@(InlinedContent)" Overwrite="true" />
+
+		<CompressorTask CssFiles="%(Css.Baked)" CssOutputFile="%(Css.Baked)" CssCompressionType="Hybrid" PreserveAllSemicolons="false" LoggingType="None" />
+
+		<ItemGroup>
+			<Content Remove="*.css"/>
+			<Content Include="%(Css.Baked)"/>
+		</ItemGroup>
+		
+		<OnError ExecuteTargets="BakeClean"/>
+	</Target>
+
+	<UsingTask TaskName="CompressorTask" AssemblyFile="$(MSBuildThisFileDirectory)Yahoo.Yui.Compressor.dll" />
+
+	<UsingTask
+		TaskName="CssInlineImports"
+		TaskFactory="CodeTaskFactory"
+		AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" >
+		<ParameterGroup>
+			<File ParameterType="System.String" Required="true" />
+			<Content ParameterType="System.String" Output="true" />
+		</ParameterGroup>
+		<Task>
+			<Using Namespace="System"/>
+			<Using Namespace="System.Text.RegularExpressions"/>
+			<Code Type="Fragment" Language="cs">
+				<![CDATA[
+				var import = new Regex(@"@import\W+url\((['""]?)(?<file>[\w.-]+)\1\);", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+				Func<string, string> inlineImportsIn = null;
+				inlineImportsIn = file => import.Replace(System.IO.File.ReadAllText(file), match => inlineImportsIn(match.Groups["file"].Value));
+				Content = inlineImportsIn(File);
+				]]>
+			</Code>
+		</Task>
+	</UsingTask>
 
 </Project>
 
