@@ -1,18 +1,19 @@
 ﻿open System
 #load @"fspec.fsx"
 
-describe "specs, when executed" <| fun()->
-  it "should succeed" <| fun()->
-    ()
-
-  it "should fail" <| fun()->
-    fail()
-
-  it "should epic fail" <| fun()->
-    failwith "epic failure"
-
-  it "should be pending" <| fun()->
-    pending "since I said so"
+describe "spec" <| fun()->
+  context "when executed" <| fun()->
+    it "should succeed" <| fun()->
+      ()
+  
+    it "should fail" <| fun()->
+      fail()
+  
+    it "should epic fail" <| fun()->
+      failwith "epic failure"
+  
+    it "should be pending" <| fun()->
+      pending "since I said so"
   
 describe "be: tests equality for" <| fun()->
   it "numbers" <| fun()->

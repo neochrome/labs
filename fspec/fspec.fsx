@@ -1,40 +1,49 @@
 ﻿[<AutoOpen>]
 module Fspec
 open System
+
+type String with
+  member this.FormatWith([<ParamArray>] args: Object[]) =
+    String.Format(this, args)
+
 exception private Fail
 exception private Pending of string
 
-let private verifyBehaviour description behaviour =
+let private verify_example implementation description =
   try
-    behaviour()
+    implementation()
     printfn "  - %s" description
   with
   | Fail -> printfn "F - %s" description
   | Pending(why) -> printfn "P - %s (%s)" description why
   | epic -> printfn "E - %s (%s)" description epic.Message
 
-let describe something behaves =
-  printfn "%s: " something
-  behaves()
+let private group_of_examples description examples =
+  printfn "%s: " description
+  examples()
   printfn ""
 
-let it should behave =
-  verifyBehaviour should behave
+let private one_example description implementation =
+  description |> verify_example implementation
 
-//let private format how what =
-//  let (|Int|_|) what =
-//    if Int32.
-
-
-let for_all should args behave = 
-  args |> Seq.iter (fun arg ->
-    let shouldText = System.String.Format(should, [arg])
-    verifyBehaviour shouldText (fun () -> behave arg)
+let private one_example_with_rows (description:string) rows implementation = 
+  rows |> Seq.iter (fun row ->
+    description.FormatWith(row :> Object)
+    |> verify_example (fun () -> implementation row)
   )
 
+
+// syntax
+// description & context
+let describe = group_of_examples
+let context = group_of_examples
+let it = one_example
+let for_all = one_example_with_rows
+
+// expectations
 let pending why = raise(Pending(why))
 let fail() = raise(Fail)
-let private verify expectation = if not expectation then fail()
-let should what = what
-let be expected actual = verify (actual = expected)
-let not_be expected actual = verify (actual <> expected)
+let private verify_expectation expectation = if not expectation then fail()
+let should expectation = expectation
+let be expected actual = verify_expectation (actual = expected)
+let not_be expected actual = verify_expectation (actual <> expected)
