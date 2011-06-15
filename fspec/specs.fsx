@@ -36,14 +36,14 @@ describe "not_be: tests equality for" <| fun()->
 
 describe "row input" <| fun()->
   [2; 4; 6; 8]
-  |> for_all "test {0}" <| fun x ->
+  |> for_all "test %d" <| fun x ->
       x % 2 |> should be 0
   ['a';'b';'c']
-  |> for_all "test {0}" <| fun x ->
+  |> for_all "test %c" <| fun x ->
       x |> should be x
   ["apple";"banana";"clementine"]
-  |> for_all "test {0}" <| fun x ->
+  |> for_all "test %s" <| fun x ->
       x |> should be x
   [(1,1,2);(1,2,3)]
-  |> for_all "test {0}" <| fun (a,b,c) ->
+  |> for_all "test %A" <| fun (a,b,c) ->
       a + b |> should be c

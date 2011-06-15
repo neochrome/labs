@@ -2,33 +2,38 @@
 module Fspec
 open System
 
-type String with
-  member this.FormatWith([<ParamArray>] args: Object[]) =
-    String.Format(this, args)
-
 exception private Fail
 exception private Pending of string
 
+let cprintfn color =
+   Printf.kprintf (fun text ->
+      try
+         Console.ForegroundColor <- color
+         Console.WriteLine(text)
+      finally
+         Console.ResetColor()
+   )
+
 let private verify_example implementation description =
-  try
-    implementation()
-    printfn "  - %s" description
-  with
-  | Fail -> printfn "F - %s" description
-  | Pending(why) -> printfn "P - %s (%s)" description why
-  | epic -> printfn "E - %s (%s)" description epic.Message
+   try
+      implementation()
+      cprintfn ConsoleColor.Green " - %s" description
+   with
+   | Pending(why) -> cprintfn ConsoleColor.DarkGray " - %s (%s)" description why
+   | Fail         -> cprintfn ConsoleColor.Red      " - %s"      description
+   | epic         -> cprintfn ConsoleColor.Red      " - %s (%s)" description epic.Message
 
 let private group_of_examples description examples =
-  printfn "%s: " description
+  printfn "%s:" description
   examples()
   printfn ""
 
 let private one_example description implementation =
   description |> verify_example implementation
 
-let private one_example_with_rows (description:string) rows implementation = 
+let private one_example_with_rows description rows implementation = 
   rows |> Seq.iter (fun row ->
-    description.FormatWith(row :> Object)
+    sprintf description row
     |> verify_example (fun () -> implementation row)
   )
 
