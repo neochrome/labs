@@ -51,4 +51,13 @@ describe('linq4js', function(){
 		});
 	});
 
+	describe('where', function(){
+		it('should not filter for missing predicate', function(){
+			var items = linq4([1,2,3]);
+			var after = items.where();
+			expect(after).toBe(items);
+		});
+
+	});
+
 });
