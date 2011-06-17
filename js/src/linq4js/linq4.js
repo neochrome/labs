@@ -13,6 +13,7 @@
 		for(var i = 0, max = this._elements.length; i < max; i++){
 			fn.call(this, this._elements[i], i);
 		}
+		return this;
 	};
 })(this);
 

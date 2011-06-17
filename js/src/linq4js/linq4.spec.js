@@ -41,6 +41,14 @@ describe('linq4js', function(){
 			items.each(callback);
 			expect(callback).not.toHaveBeenCalled();
 		});
+
+		it('should chain', function(){
+			var first = jasmine.createSpy();
+			var second = jasmine.createSpy();
+			linq4([42]).each(first).each(second);
+			expect(first).toHaveBeenCalled();
+			expect(second).toHaveBeenCalled();
+		});
 	});
 
 });
