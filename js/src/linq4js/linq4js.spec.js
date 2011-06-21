@@ -1,5 +1,5 @@
 describe('linq4js', function(){
-	var linq4 = require('./linq4.2.js');
+	var linq4 = require('./linq4js.js');
 
 	beforeEach(function(){
 		this.addMatchers({
