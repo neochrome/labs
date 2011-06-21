@@ -198,15 +198,42 @@ describe('linq4js', function(){
 	});
 	
 	describe('min', function(){
+		// to be continued
 	});
 	
 	describe('minBy', function(){
+		// to be continued
 	});
 	
 	describe('max', function(){
+		// to be continued
 	});
 	
 	describe('maxBy', function(){
+		// to be continued
 	});
 
+	describe('groupBy', function(){
+		// to be continued
+	});
+
+	describe('zip & join?', function(){
+		// to be continued
+	});
+
+	describe('window', function(){
+		// to be continued
+	});
+
+	describe('find & first', function(){
+		// to be continued
+	});
+
+	describe('single', function(){
+		// to be continued
+	});
+
+	describe('fold', function(){
+		// to be continued
+	});
 });
