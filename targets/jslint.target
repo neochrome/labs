@@ -1,0 +1,95 @@
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<!-- Example Usage:
+	<Import Project="jslint.target" />
+	<ItemGroup>
+		<JavaScript Include="content\scripts\**\*.js" Exclude="**\*.min.js;**\*.controller.js">
+			<Lint>false</Lint>
+		</JavaScript>
+		<JavaScript Include="content\scripts\**\*.controller.js" Exclude="**\*.min.js">
+			<Lint>true</Lint>
+		</JavaScript>
+	</ItemGroup>
+	-->
+
+	<Target Name="JSLint" AfterTargets="Compile" Condition="'@(JavaScript)' != ''">
+		<PropertyGroup>
+			<Base>$(MSBuildThisFileDirectory)</Base>
+			<Jsl>$(Base)jsl.exe</Jsl>
+			<JslConf>$(Base)jsl.default.conf</JslConf>
+		</PropertyGroup>
+		<ItemGroup>
+			<Source Include="%(JavaScript.FullPath)" Condition="'%(JavaScript.Lint)' == 'true'"/>
+		</ItemGroup>
+		<Lint
+			Jsl="$(Jsl)"
+			JslConf="$(JslConf)"
+			SourceFiles="@(Source)"
+			WarningAsError="true"/>
+	</Target>
+
+	<UsingTask
+		TaskName="Lint"
+		TaskFactory="CodeTaskFactory"
+		AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" >
+		<ParameterGroup>
+			<Jsl ParameterType="System.String" Required="true" />
+			<JslConf ParameterType="System.String" Required="true" />
+			<SourceFiles ParameterType="System.String[]" Required="true" />
+			<WarningAsError ParameterType="System.Boolean" Required="false" />
+		</ParameterGroup>
+		<Task>
+			<Using Namespace="System"/>
+			<Using Namespace="System.Diagnostics"/>
+			<Using Namespace="System.Linq"/>
+			<Using Namespace="System.Text.RegularExpressions"/>
+			<Using Namespace="Microsoft.Build.Utilities"/>
+			<Code Type="Fragment" Language="cs">
+				<![CDATA[
+				Func<TaskLoggingHelper, Action<string, int, string>> LogAsError = log => (filename, row, message) => log.LogError("", "", "", filename, row, 0, 0, 0, message);
+				Func<TaskLoggingHelper, Action<string, int, string>> LogAsWarning = log => (filename, row, message) => log.LogWarning("", "", "", filename, row, 0, 0, 0, message);
+				Func<string, string, Action<string, int, string>, bool> Parse = (input, pattern, log) => {
+					var any = false;
+					Regex.Matches(input, pattern)
+					.OfType<Match>()
+					.Select(x => new { Filename = x.Groups["filename"].Value, Row = Convert.ToInt32("0" + x.Groups["row"].Value), Message = x.Groups["message"].Value })
+					.ToList()
+					.ForEach(x => { log(x.Filename, x.Row, x.Message); any = true; });
+					return any;
+				};
+				
+				var errors = false;
+				var warnings = false;
+
+				foreach(var file in SourceFiles){
+					var output = "";
+					var exitCode = 0;
+					
+					using(var jsl = new Process{
+						StartInfo = new ProcessStartInfo{
+							CreateNoWindow = true,
+							FileName = Jsl,
+							UseShellExecute = false,
+							RedirectStandardOutput = true,
+							Arguments = string.Format("-conf \"{0}\" -nologo -nofilelisting -nocontext -nosummary -process \"{1}\"", JslConf, file),
+						}
+						}){
+						jsl.Start();
+						output = jsl.StandardOutput.ReadToEnd();
+						jsl.WaitForExit(2000);
+						exitCode = jsl.ExitCode;
+					}
+
+					if(Parse(output, @"(?<filename>.*)\((?<row>\d+)\): SyntaxError: (?<message>.*)", LogAsError(Log)) || exitCode > 1)
+						errors = true;
+					if(Parse(output, @"(?<filename>.*)\((?<row>\d+)\): lint warning: (?<message>.*)", WarningAsError ? LogAsError(Log) : LogAsWarning(Log)) || exitCode == 1)
+						warnings = true;
+				}
+
+				return !(errors || (warnings && WarningAsError));
+				]]>
+			</Code>
+		</Task>
+	</UsingTask>
+
+</Project>
