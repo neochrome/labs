@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>tiny wiki</title>
+		<link href="wiki.css" rel="stylesheet" />
+	</head>
+	<body>
+		<header></header>
+		<nav>
+			<ul>
+				<li><a href="page1.html">Page 1</a></li>
+				<li><a href="page2.html">Page 2</a></li>
+			</ul>
+		</nav>
+		<article>
+		</article>
+		<footer></footer>
+		<script src="jquery-1.6.2.min.js"></script>
+		<script src="jQuery.twFile.min.js"></script>
+		<script>
+			(function($){
+				var $_load = $.fn.load;
+				$.fn.extend({
+					load: function(uri, params, callback){
+						if(location.protocol.match(/^(http|https):$/i)){
+							return $_load.apply(this, arguments);
+						} else {	
+							var localFile = $.twFile.convertUriToLocalPath(uri);
+							var content = $.twFile.load(localFile);
+							this.html(content);
+							return this;
+						}
+					}
+				});
+			})(jQuery);
+
+			function nav(e){
+				e.preventDefault();
+				$('article').load(this.href);
+				$('article a').click(nav);
+			}
+
+			$(function(){
+				$('nav a').click(nav);
+			});
+
+		</script>
+	</body>
+</html>
