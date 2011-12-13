@@ -1,32 +1,73 @@
 var sys = require('sys');
+var http = require('http');
+var url = require('url');
+var _ = require('underscore');
 var Twitter = require('ntwitter');
 var options = require('./options.js');
 
-var twit = new Twitter(options);
+var twitter = new Twitter(options);
 
-twit.stream('user', function(stream){
+twitter.stream('user', function(stream){
 	stream.on('data', function(data){
 		if(typeof data.id_str === 'undefined'){
 			console.log(sys.inspect(data));
 			return;
 		}
-		console.log('text: ' + data.text);
-		console.log('#  s: ' + sys.inspect(data.entities.hashtags));
-		console.log('urls: ' + sys.inspect(data.entities.urls));
-		//console.log(sys.inspect(data));
-		
-		if(data.text === 'echo'){
-			twit.updateStatus('re: echo', {in_reply_to_status_id:data.id_str}, function(err, data){
-				console.log(sys.inspect(err));
-			});
+
+		var tweet = new Tweet(data);
+		if(tweet.isResponse || !tweet.hasLink){
+			return;
 		}
+
+		console.log('downloading \'' + tweet.url + '\'');
+		var dlOptions = url.parse(tweet.url);
+		dlOptions.path = dlOptions.pathname;
+		http.get(dlOptions, function(res){
+			switch(res.statusCode){
+				case 200:
+					tweet.respond(twitter, 'done');
+					console.log('done downloading \'' + tweet.url + '\'');
+					break;
+				default:
+					tweet.respond(twitter, ['error', 'code' + res.statusCode]);
+					console.log('done downloading \'' + tweet.url + '\'');
+			}
+		}).on('error', function(e){
+			console.log('error when downloading \'' + tweet.url + '\'\n' + e.message);
+		});
 
 	});
 	stream.on('end', function(res){
-		console.log('end: ');// + sys.inspect(res));
+		console.log('end: ');
 	});
 	stream.on('destroy', function(res){
-		console.log('destroy: ');// + sys.inspect(res));
+		console.log('destroy: ');
 	});
-	//setTimeout(stream.destroy, 5000);
 });
+
+
+var Tweet = function(tweetData){
+	this.user = '@' + tweetData.user.screen_name;
+	this.id = tweetData.id_str;
+	this.hasLink = tweetData.entities.urls.length > 0;
+	if(this.hasLink){
+		this.url = tweetData.entities.urls[0].expanded_url;
+	}
+	this.isResponse = 
+		_(tweetData.entities.hashtags)
+		.chain()
+		.map(function(tag){ return tag.text; })
+		.any(function(tag){ return _(['done','error']).contains(tag); })
+		.value();
+};
+Tweet.prototype.composeResponse = function(status){
+	if(Array.isArray(status) === false){ status = [status]; }
+	var tags = _.reduce(status, function(tags, tag) { return tags + ' #' + tag; }, '');
+	return this.url + ' ' + tags + ' ' + this.user;
+};
+Tweet.prototype.respond = function(twitter, status){
+	twitter.updateStatus(this.composeResponse(status), {in_reply_to_status_id:this.id}, function(err, data){
+		if(err !== null){ throw err; }
+	});
+};
+
