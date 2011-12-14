@@ -1,11 +1,19 @@
 var sys = require('sys');
 var http = require('http');
 var url = require('url');
+var path = require('path');
+var fs = require('fs');
+var util = require('util');
 var _ = require('underscore');
 var Twitter = require('ntwitter');
 var options = require('./options.js');
 
 var twitter = new Twitter(options);
+
+
+var state = { lastSeenId: null };
+twitter.getUserTimeline({max_id:state.lastSeenId}, function(err, data){
+});
 
 twitter.stream('user', function(stream){
 	stream.on('data', function(data){
@@ -14,26 +22,44 @@ twitter.stream('user', function(stream){
 			return;
 		}
 
+		// save last seen id
+		state.lastSeenId = data.id_str;
+		fs.writeFileSync('state.json', JSON.stringify(state), 'utf8');
+		console.log('state was saved:\n' + sys.inspect(state)); 
+
+		// do nothing if a reply or has no link
 		var tweet = new Tweet(data);
 		if(tweet.isResponse || !tweet.hasLink){
 			return;
 		}
 
-		console.log('downloading \'' + tweet.url + '\'');
+		// download the links from the message and respond when done
 		var dlOptions = url.parse(tweet.url);
 		dlOptions.path = dlOptions.pathname;
+		var filename = path.basename(dlOptions.path);
+		console.log('downloading \'' + tweet.url + '\' to: ' + filename);
 		http.get(dlOptions, function(res){
 			switch(res.statusCode){
 				case 200:
-					tweet.respond(twitter, 'done');
-					console.log('done downloading \'' + tweet.url + '\'');
+					res.on('end', function(){
+						tweet.respond(twitter, 'done');
+						console.log('done downloading \'' + tweet.url + '\'');
+					});
+					var file = fs.createWriteStream(filename);
+					file
+						.once('open', function(fd){
+							util.pump(res, file, function(e){
+								tweet.respond(twitter, 'error');
+								console.log('error downloading \'' + tweet.url + '\'\n' + e.message);
+							});
+						});
 					break;
 				default:
 					tweet.respond(twitter, ['error', 'code' + res.statusCode]);
 					console.log('done downloading \'' + tweet.url + '\'');
 			}
 		}).on('error', function(e){
-			console.log('error when downloading \'' + tweet.url + '\'\n' + e.message);
+			console.log('error downloading \'' + tweet.url + '\'\n' + e.message);
 		});
 
 	});
