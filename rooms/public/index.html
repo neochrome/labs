@@ -3,24 +3,92 @@
 	<head>
 		<meta charset="utf-8" />
 		<link href="/main.css" rel="stylesheet" />
-		<title>Chat</title>
+		<title>Rooms</title>
 		<script src="/angular-0.9.19.min.js" ng:autobind></script>
 		<script src="/socket.io/socket.io.js"></script>
 	</head>
-	<body>
-		<ul ng:controller="RoomsController" ng:repeat="room in rooms">
-			<li ng:bind="room"></li>
-		</ul>
+	<body ng:controller="AppController">
+		<aside id="rooms">
+			<h2>Rooms</h2>
+			<ul>
+				<li ng:repeat="room in rooms">
+					<a ng:href="#/{{room}}" ng:bind="room"></a>
+				</li>
+			</ul>
+		</aside>
+		<section id="room">
+			<h1>In: {{name}}</h1>
+			<ul>
+				<li ng:repeat="message in messages">{{message.name}}: {{message.text}}</li>
+			</ul>
+			<form ng:submit="send(text)">
+				<input type="text" name="text"/>
+				<input type="submit" value="Send"/>
+			</form>
+		</section>
 	</body>
 	<script>
-		var socket = io.connect();
-
-		var RoomsController = function(){
-			this.rooms = [];
+		// ---------------------------------------------
+		var AppController = function($route, ChatService){
 			var self = this;
-			socket.on('rooms', function(rooms){
+			self.rooms = [];
+			self.messages = [];
+			self._chat = ChatService;
+
+			$route.when('/:room');
+			$route.otherwise({ redirectTo: '/' });
+			$route.onChange(function(){
+				self._chat.join(($route.current.params || {}).room);
+			});
+			
+			self._chat.on('rooms', function(rooms){
 				self.rooms = rooms;
+				self.$eval();
+			});
+			
+			self._chat.on('room', function(room){
+				self.name = room;
+				self.messages = [];
+			});
+			self._chat.on('message', function(message){
+				self.messages.push(message);
+				self.messages.splice(0, self.messages.length - 10);
+				self.$eval();
 			});
 		};
+		AppController.prototype.send = function(text){
+			this._chat.send(text);
+			this.text = '';
+		};
+
+		
+		// ---------------------------------------------
+		var ChatService = function(){
+			var self = this;
+			self.socket = io.connect();
+			self.socket.on('rooms', function(rooms){
+				self.emit('rooms', rooms);
+			});
+			self.socket.on('room', function(room){
+				self.room = room;
+				self.emit('room', room || 'lobby');
+			});
+			self.socket.on('message', function(message){
+				if(message.room === self.room){
+					self.emit('message', { name: message.name, text: message.text});
+				}
+			});
+		};
+		ChatService.prototype = new io.EventEmitter();
+		ChatService.prototype.join = function(room){
+			this.socket.emit('join', room);
+		};
+		ChatService.prototype.send = function(text){
+			this.socket.emit('message', text);
+		};
+		angular.service('ChatService', function(){
+			return new ChatService();
+		});
+
 	</script>
 </html>
