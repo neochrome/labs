@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en" xmlns:ng="http://angularjs.org">
+	<head>
+		<meta charset="utf-8" />
+		<link href="/main.css" rel="stylesheet" />
+		<title>Chat</title>
+		<script src="/angular-0.9.19.min.js" ng:autobind></script>
+		<script src="/socket.io/socket.io.js"></script>
+	</head>
+	<body>
+		<ul ng:controller="RoomsController" ng:repeat="room in rooms">
+			<li ng:bind="room"></li>
+		</ul>
+	</body>
+	<script>
+		var socket = io.connect();
+
+		var RoomsController = function(){
+			this.rooms = [];
+			var self = this;
+			socket.on('rooms', function(rooms){
+				self.rooms = rooms;
+			});
+		};
+	</script>
+</html>
