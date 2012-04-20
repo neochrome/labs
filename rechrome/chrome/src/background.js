@@ -13,54 +13,30 @@ var icon = {
 	}
 };
 
-
-var states = fsm({
+var states = fsm.create({
 	DISABLED:{
 		toggle: function(){
 			icon.enabled();
-			//comet.launch();
-			this.SYNCING();
-		},
-		success:function(){
-			//comet.stop();
-			this.DISABLED();
-		},
-		fail:function(){
-			//comet.stop();
-			this.DISABLED();
-		}
-	},
-	SYNCING:{
-		toggle:function(){
-			icon.disabled();
-			//comet.stop();
-			this.DISABLED();
-		},
-		success:function(data){
-			console.log('synced: ' + lastChange + ' => ' + data.lastChange);
-			lastChange = data.lastChange;
 			this.ENABLED();
 		},
-		fail:function(){
-			icon.error();
-			this.FAILED();
-		}
+		change:function(){},
+		fail:function(){}
 	},
 	ENABLED:{
 		toggle:function(){
 			icon.disabled();
-			//comet.stop();
 			this.DISABLED();
 		},
-		success:function(data){
+		change:function(data){
+			console.log('refresh:', lastChange, '<', data.lastChange);
 			if(lastChange < data.lastChange){
 				console.log('reload: ' + lastChange + ' => ' + data.lastChange);
 				lastChange = data.lastChange;
-				refresh();
+				refreshCurrentTab();
 			}
-			this.ENABLED();
 		},
-		fail:function(){
+		fail:function(error){
+			console.error(error);
 			icon.error();
 			this.FAILED();
 		}
@@ -68,29 +44,26 @@ var states = fsm({
 	FAILED:{
 		toggle:function(){
 			icon.disabled();
-			//comet.stop();
 			this.DISABLED();
 		},
-		success:function(){
+		change:function(data){
 			icon.enabled();
-			refresh();
-			this.ENABLED();
+			this.ENABLED().change(data);
 		},
-		fail:function(){
+		fail:function(error){
+			console.error(error);
 			timesFailed++;
 			if(timesFailed >= 5){
 				timesFailed = 0;
 				icon.disabled();
-				//comet.stop();
 				this.DISABLED();
-			} else {
-				this.FAILED();
 			}
 		}
 	}
 }).DISABLED();
 
-var refresh = function(){
+var refreshCurrentTab = function(){
+	console.log('refreshing current tab');
 	chrome.windows.getCurrent(function(window){
 		chrome.tabs.getSelected(window.id, function(tab){
 			chrome.tabs.update(tab.id, {url:tab.url});
@@ -104,9 +77,8 @@ chrome.browserAction.onClicked.addListener(function(tab){
 
 var lastChange = 0;
 var timesFailed = 0;
-/*
-var comet = new Comet('http://localhost:1337/')
-	.launchParams(function(){ return {lastChange:lastChange}; })
-	.data(function(data){ states.success(data); })
-	.error(function(){ states.fail(); });
-*/
+
+var socket = io.connect('http://localhost:1337');
+socket.on('change', function(data){states.change(data);});
+socket.on('error', function(){states.fail();});
+socket.on('disconnected', function(){icon.disabled();states.DISABLED();});
