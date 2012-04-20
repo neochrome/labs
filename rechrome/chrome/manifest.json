@@ -1,0 +1,14 @@
+{
+	"name":"rechrome",
+	"version":"0.0.1",
+	"description":"Chrome tab reloader",
+	"icons":{"128":"images/icon.png"},
+	"background_page":"views/background.html",
+	"permissions":[
+		"tabs",
+		"http://localhost/"
+	],
+	"browser_action":{
+		"default_icon":"images/icon-disabled.png"
+	}
+}
